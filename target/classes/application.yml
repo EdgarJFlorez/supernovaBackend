@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: inventario
+
+  jpa:
+    hibernate:
+      ddl-auto: none          # valores por defecto cuando NO hay perfil activo
+    show-sql: false
+    properties:
+      hibernate.format_sql: true
+
+# =======================
+# Perfil de DESARROLLO
+# =======================
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/inventario?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&useUnicode=true&characterEncoding=utf8
+    username: root        # pon aquí tu usuario (o 'root' si lo usas)
+    password: Monaco17n.
+
+  jpa:
+    hibernate:
+      ddl-auto: validate             # valida contra tus tablas, no las crea
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+      hibernate.jdbc.time_zone: UTC
+      # hibernate.dialect: org.hibernate.dialect.MySQL8Dialect  # (opcional, Boot lo detecta)
+
+  flyway:
+    enabled: true
+    schemas: inventario
+    baseline-on-migrate: true        # marca el esquema existente como V1
+    baseline-version: 1
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+  # Temporalmente excluimos estos paths del documento
+  paths-to-exclude: /error, /api/categorias/**, /api/productos/**
+logging:
+  level:
+    org.springdoc: DEBUG
+    org.springframework.web: DEBUG
+server:
+  port: 8080
+  error:
+    include-stacktrace: ALWAYS
