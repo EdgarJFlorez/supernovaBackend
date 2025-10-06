@@ -25,5 +25,18 @@ public class ProductoController {
     public ProductoDTO crear(@RequestBody ProductoDTO dto) {
         return service.crear(dto);
     }
+
+    @PutMapping("/{id}")
+    public ProductoDTO actualizar(@PathVariable Long id, @RequestBody ProductoDTO dto) {
+        dto.setId(id);
+        return service.actualizar(dto);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminar(@PathVariable Long id) {
+        service.eliminar(id);
+    }
 }
+
 

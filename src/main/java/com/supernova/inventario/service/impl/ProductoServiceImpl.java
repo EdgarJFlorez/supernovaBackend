@@ -21,37 +21,63 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     public List<ProductoDTO> listar(String q) {
-        var lista = (q == null || q.isBlank())
+        List<Producto> productos = (q == null || q.isBlank())
                 ? productoRepo.findAll()
                 : productoRepo.findByNombreContainingIgnoreCase(q);
 
-        return lista.stream().map(p -> ProductoDTO.builder()
-                        .id(p.getId())
-                        .nombre(p.getNombre())
-                        .descripcion(p.getDescripcion())
-                        .stock(p.getStock())
-                        .precio(p.getPrecio())
-                        .categoriaId(p.getCategoria() != null ? p.getCategoria().getId() : null)
-                        .build())
+        return productos.stream()
+                .map(this::mapToDTO)
                 .toList();
     }
 
     @Override
     public ProductoDTO crear(ProductoDTO dto) {
-        Categoria cat = categoriaRepo.findById(dto.getCategoriaId())
+        Categoria categoria = categoriaRepo.findById(dto.getCategoriaId())
                 .orElseThrow(() -> new RecursoNoEncontradoException("Categoría no encontrada"));
 
-        Producto p = Producto.builder()
+        Producto producto = Producto.builder()
                 .nombre(dto.getNombre())
                 .descripcion(dto.getDescripcion())
                 .stock(dto.getStock())
                 .precio(dto.getPrecio())
-                .categoria(cat)
+                .categoria(categoria)
                 .build();
 
-        p = productoRepo.save(p);
-        dto.setId(p.getId());
-        return dto;
+        return mapToDTO(productoRepo.save(producto));
+    }
+
+    @Override
+    public ProductoDTO actualizar(ProductoDTO dto) {
+        Producto producto = productoRepo.findById(dto.getId())
+                .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
+
+        producto.setNombre(dto.getNombre());
+        producto.setDescripcion(dto.getDescripcion());
+        producto.setStock(dto.getStock());
+        producto.setPrecio(dto.getPrecio());
+
+        return mapToDTO(productoRepo.save(producto));
+    }
+
+    @Override
+    public void eliminar(Long id) {
+        if (!productoRepo.existsById(id)) {
+            throw new RecursoNoEncontradoException("Producto no encontrado");
+        }
+        productoRepo.deleteById(id);
+    }
+
+    private ProductoDTO mapToDTO(Producto p) {
+        return ProductoDTO.builder()
+                .id(p.getId())
+                .nombre(p.getNombre())
+                .descripcion(p.getDescripcion())
+                .stock(p.getStock())
+                .precio(p.getPrecio())
+                .categoriaId(p.getCategoria() != null ? p.getCategoria().getId() : null)
+                .categoriaNombre(p.getCategoria() != null ? p.getCategoria().getNombre() : "Sin categoría")
+                .build();
     }
 }
+
 

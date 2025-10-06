@@ -6,4 +6,6 @@ import java.util.List;
 public interface ProductoService {
     List<ProductoDTO> listar(String q);
     ProductoDTO crear(ProductoDTO dto);
+    ProductoDTO actualizar(ProductoDTO dto);
+    void eliminar(Long id);
 }
